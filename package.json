@@ -2,16 +2,21 @@
   "name": "next-shortcut-manager",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "electron-dev": "wait-on http://localhost:3000 && cross-env NODE_ENV=development electron ."
   },
   "dependencies": {
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
     "next": "16.0.10",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "wait-on": "^9.0.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
