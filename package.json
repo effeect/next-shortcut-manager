@@ -15,11 +15,14 @@
     "start-electron": "npm run build && npm run electron-build && electron dist/main/electron.js"
   },
   "dependencies": {
+    "bulma": "^1.0.4",
     "cross-env": "^10.1.0",
     "electron": "^39.2.7",
+    "electronmon": "^2.0.4",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "sass": "^1.96.0",
     "vdf-parser": "^1.2.1",
     "wait-on": "^9.0.3"
   },

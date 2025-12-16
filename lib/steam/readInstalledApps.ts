@@ -36,7 +36,6 @@ export function getInstalledSteamGames(libraryPaths: string[]) {
             const acfFileRaw = fs.readFileSync(manifestPath, "utf-8");
             const acfFile = vdf.parse(acfFileRaw) as any;
             const game = acfFile.AppState;
-            console.log(game);
             games.push({
               appid: game.appid,
               name: game.name,
@@ -53,4 +52,6 @@ export function getInstalledSteamGames(libraryPaths: string[]) {
       console.warn(`Error processing library ${libPath}:`, err);
     }
   }
+
+  return games;
 }

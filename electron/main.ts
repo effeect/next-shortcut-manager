@@ -7,10 +7,6 @@ import { steam } from "./handles/steam.ts";
 // Steam
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-
-import { getSteamInstalledPaths } from "../lib/steam/readLibraryFolders.ts";
-import { getInstalledSteamGames } from "../lib/steam/readInstalledApps.ts";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,15 +24,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  ipcMain.handle("get-installed-steam-games", async () => {
-    // We will grab the libraries from the steam
-    // Note for future we need to include a param for SteamInstalledPaths
-    const libraries = getSteamInstalledPaths();
-    // And then read the games in
-    const games = getInstalledSteamGames(libraries);
-    console.log(games);
-    return games;
-  });
+  ipcMain.handle("get-installed-steam-games", steam);
   createWindow();
 
   app.on("activate", () => {

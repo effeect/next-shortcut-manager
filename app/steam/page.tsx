@@ -27,26 +27,30 @@ export default function InstalledGamesPage() {
       typeof window !== "undefined" &&
       window.electronAPI?.getInstalledSteamGames
     ) {
-      window.electronAPI.getInstalledSteamGames().then(setGames);
+      window.electronAPI.getInstalledSteamGames().then((data) => {
+        setGames(data);
+      });
     } else {
       console.warn("Electron API not available");
     }
   }, []);
-
-  console.log(games);
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="columns is-multiline">
         {games?.map((game) => (
-          <div key={game.appid} className="border p-4 rounded shadow">
-            <h2 className="text-lg font-semibold">{game.name}</h2>
-            <p className="text-sm text-gray-600">{game.path}</p>
-            <button
-              className="mt-2 px-4 py-1 bg-blue-600 text-white rounded"
-              onClick={() => window.open(`steam://run/${game.appid}`)}
-            >
-              Launch
-            </button>
+          <div key={game.appid} className="column is-half">
+            <div className="box">
+              <p className="title is-4">{game.name}</p>
+              <p className="subtitle is-6 has-text-grey">{game.path}</p>
+              <div className="mt-3">
+                <button
+                  className="button is-link"
+                  onClick={() => window.open(`steam://run/${game.appid}`)}
+                >
+                  Launch
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>

@@ -8,6 +8,5 @@ export const steam = async () => {
   const libraries = getSteamInstalledPaths();
   // And then read the games in
   const games = getInstalledSteamGames(libraries);
-  console.log(games);
   return games;
 };
