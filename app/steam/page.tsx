@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import Gamebox from "../components/atoms/Gamebox/Gamebox";
 // Steam Type details, will fill more in later
 type Game = {
   appid: string;
@@ -9,14 +9,6 @@ type Game = {
   installdir: string;
   path: string;
 };
-
-declare global {
-  interface Window {
-    electronAPI?: {
-      getInstalledSteamGames: () => Promise<Game[]>;
-    };
-  }
-}
 
 export default function InstalledGamesPage() {
   // State for the games list
@@ -39,18 +31,7 @@ export default function InstalledGamesPage() {
       <div className="columns is-multiline">
         {games?.map((game) => (
           <div key={game.appid} className="column is-half">
-            <div className="box">
-              <p className="title is-4">{game.name}</p>
-              <p className="subtitle is-6 has-text-grey">{game.path}</p>
-              <div className="mt-3">
-                <button
-                  className="button is-link"
-                  onClick={() => window.open(`steam://run/${game.appid}`)}
-                >
-                  Launch
-                </button>
-              </div>
-            </div>
+            <Gamebox name={game.name} appid={game.appid} path={game.path} />
           </div>
         ))}
       </div>
