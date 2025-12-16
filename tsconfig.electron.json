@@ -2,13 +2,13 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS", // <-- Targets CommonJS
-    "moduleResolution": "Node", // <-- Uses standard Node resolution
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist/electron", // <-- Output compiled files here
-    "rootDir": "./",
+    "rootDir": "electron",
     "forceConsistentCasingInFileNames": true,
     "types": ["node", "electron"]
   },

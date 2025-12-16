@@ -2,17 +2,18 @@
   "name": "next-shortcut-manager",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/electron/main.js",
+  "main": "dist/electron/electron/main.js",
   "scripts": {
     "next-dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "electron:main": "electronmon --trace-warnings -r ts-node/register electron/main.ts",
-    "electron-dev": "concurrently -k \"npm run next-dev\" \"wait-on http-get://localhost:3000 && npm run electron:main\"",
-    "electron-dev-standalone": "ts-node --project tsconfig.electron.json electron/main.ts",
-    "electron-build": "tsc",
-    "start-electron": "npm run build && npm run electron-build && electron dist/main/electron.js"
+    "renderer:build": "next build",
+    "electron:build": "tsc -p tsconfig.electron.json",
+    "electron:start": "electron dist/electron/main.js",
+    "electron:wait-and-start": "wait-on http://localhost:3000 && npm run electron:start",
+    "electron:dev": "cross-env NODE_ENV=development concurrently -k \"npm run next-dev\" \"npm run electron:build -- --watch\" \"npm run electron:wait-and-start\"",
+    "start-electron": "npm run renderer:build && npm run electron:build && electron dist/electron/main.js"
   },
   "dependencies": {
     "bulma": "^1.0.4",
@@ -36,6 +37,7 @@
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }

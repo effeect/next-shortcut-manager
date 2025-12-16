@@ -2,25 +2,49 @@ import { app, BrowserWindow } from "electron";
 // import isDev from "electron-is-dev";
 import { ipcMain } from "electron";
 // Imports for handles for game launchers
-import { steam } from "./handles/steam.ts";
+import { steam } from "./handles/steam";
 //IPC Handles
 // Steam
-import { fileURLToPath } from "node:url";
 import path from "node:path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
+// Way to determine if the electron app is packaged or not
+const isDev = process.env.NODE_ENV === "development";
+
+console.log(isDev);
+console.log(process.env.NODE_ENV);
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.ts"),
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
-  // Need to change to a path.join in the next build/dev stuff
-  win.loadURL("http://localhost:3000");
+  // 2. URL/File to Load
+  if (isDev) {
+    console.log("here");
+    // DEVELOPMENT: Load the Next.js development server URL
+    win.loadURL("http://localhost:3000");
+    win.webContents.openDevTools(); // Optional: open dev tools in development
+  } else {
+    // PRODUCTION: Load the built Next.js index.html file
+    // The path must point to your built Next.js renderer files.
+    // Assuming your Next.js build output goes into a standard location like 'out' or '.next'
+    const indexPath = path.join(
+      __dirname,
+      "..",
+      "renderer",
+      "out",
+      "index.html"
+    );
+
+    // Fallback URL if using the next export command, otherwise use this:
+    // win.loadFile(indexPath);
+    console.log(`Loading production file: ${indexPath}`); // 🏆 USE win.loadFile() for static files
+
+    win.loadFile(indexPath);
+  }
 }
 
 app.whenReady().then(() => {

@@ -1,6 +1,6 @@
 // Imports for the steam stuff
-import { getSteamInstalledPaths } from "../../lib/steam/readLibraryFolders.ts";
-import { getInstalledSteamGames } from "../../lib/steam/readInstalledApps.ts";
+import { getSteamInstalledPaths } from "../lib/steam/readLibraryFolders";
+import { getInstalledSteamGames } from "../lib/steam/readInstalledApps";
 
 export const steam = async () => {
   // We will grab the libraries from the steam
