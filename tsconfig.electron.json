@@ -1,0 +1,17 @@
+// tsconfig.electron.json (Root directory)
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS", // <-- Targets CommonJS
+    "moduleResolution": "Node", // <-- Uses standard Node resolution
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist/electron", // <-- Output compiled files here
+    "rootDir": "./",
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "electron"]
+  },
+  "include": ["electron/**/*.ts"], // Only compile files within the 'electron' folder
+  "exclude": ["node_modules"]
+}
