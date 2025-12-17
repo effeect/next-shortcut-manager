@@ -18,11 +18,13 @@ type Game = {
   path: string;
 };
 
+// Needs to be moved to the global file I feel
 declare global {
   interface Window {
     electronAPI?: {
       getInstalledEpicGames: () => Promise<EpicGameManifest[]>;
       getInstalledSteamGames: () => Promise<Game[]>;
+      openFileLocation: (path: string) => void;
     };
   }
 }

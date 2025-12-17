@@ -6,6 +6,13 @@ type gameInfo = {
   appid: string;
 };
 
+const handleOpenFileLocation = (filePath: string) => {
+  if (window.electronAPI && filePath) {
+    console.log(filePath);
+    window.electronAPI.openFileLocation(filePath);
+  }
+};
+
 const Gamebox = (params: gameInfo) => {
   return (
     <div className="box">
@@ -14,20 +21,22 @@ const Gamebox = (params: gameInfo) => {
         {params.path || "Path not valid"}
       </p>
       <div className="mt-3">
-        <button
-          className="button is-link"
-          onClick={() =>
-            window.open(`steam://run/${params.appid || "Unknown App ID"}`)
-          }
-        >
-          Launch
-        </button>
-        <button
-          className="button is-danger"
-          onClick={() => window.open("Install Location")}
-        >
-          Open File Location (PLACEHOLDER)
-        </button>
+        <div className="buttons">
+          <button
+            className="button is-link"
+            onClick={() =>
+              window.open(`steam://run/${params.appid || "Unknown App ID"}`)
+            }
+          >
+            Launch
+          </button>
+          <button
+            className="button is-danger"
+            onClick={() => handleOpenFileLocation(params.path)}
+          >
+            Open File Location (PLACEHOLDER)
+          </button>
+        </div>
       </div>
     </div>
   );
