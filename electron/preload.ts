@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getInstalledSteamGames: () => ipcRenderer.invoke("get-installed-steam-games"),
   getInstalledEpicGames: () => ipcRenderer.invoke("get-installed-epic-games"),
   getInstalledEAGames: () => ipcRenderer.invoke("get-installed-ea-games"),
+  getInstalledUbiGames: () => ipcRenderer.invoke("get-installed-ubi-games"),
   openFileLocation: (filePath: string) => {
     ipcRenderer.invoke("show-item-in-folder", filePath);
   },

@@ -25,6 +25,7 @@ declare global {
       getInstalledEpicGames: () => Promise<EpicGameManifest[]>;
       getInstalledSteamGames: () => Promise<Game[]>;
       getInstalledEAGames: () => Promise<[]>;
+      getInstalledUbiGames: () => Promise<[]>;
       openFileLocation: (path: string) => void;
     };
   }

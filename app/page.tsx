@@ -18,7 +18,10 @@ export default function Home() {
               {" "}
               <Link href="/ea">EA List</Link>
             </div>
-            <div className="column">Placeholder</div>
+            <div className="column">
+              {" "}
+              <Link href="/ubi">Ubisoft List</Link>
+            </div>
           </div>
         </div>
       </section>
