@@ -24,6 +24,7 @@ declare global {
     electronAPI?: {
       getInstalledEpicGames: () => Promise<EpicGameManifest[]>;
       getInstalledSteamGames: () => Promise<Game[]>;
+      getInstalledEAGames: () => Promise<[]>;
       openFileLocation: (path: string) => void;
     };
   }

@@ -8,6 +8,7 @@ import { steam } from "./handles/steam";
 import path from "node:path";
 import { epic } from "./handles/epic";
 import { openFolder } from "./handles/openFolder";
+import { getInstalledEAGames } from "./handles/ea";
 
 // Way to determine if the electron app is packaged or not
 const isDev = process.env.NODE_ENV === "development";
@@ -45,6 +46,7 @@ function createWindow() {
 app.whenReady().then(() => {
   ipcMain.handle("get-installed-steam-games", steam);
   ipcMain.handle("get-installed-epic-games", epic);
+  ipcMain.handle("get-installed-ea-games", getInstalledEAGames);
   ipcMain.handle("show-item-in-folder", openFolder);
   createWindow();
 
