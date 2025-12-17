@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openFileLocation: (filePath: string) => {
     ipcRenderer.invoke("show-item-in-folder", filePath);
   },
+  openExternal: (url: string) => ipcRenderer.invoke("open-web-browser", url),
 });
 
 console.log("Preload Script loaded");

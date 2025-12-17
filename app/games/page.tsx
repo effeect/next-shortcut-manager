@@ -1,12 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Gamebox from "../components/atoms/Gamebox/Gamebox";
 import { GameManifest } from "@/electron/lib/types/games";
+import LoadingIcon from "../components/atoms/LoadingIcon/LoadingIcon";
+import SearchBar from "../components/molecules/SearchBar/SearchBar";
 
 export default function GamesPage() {
   const [games, setGames] = useState<GameManifest[]>([]);
   const [loading, setLoading] = useState(true);
-
+  // Filter States
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  // Search Bar Query
+  const [searchQuery, setSearchQuery] = useState<string>("");
   useEffect(() => {
     const fetchAllGames = async () => {
       try {
@@ -19,7 +24,7 @@ export default function GamesPage() {
         ]);
 
         // Needed for future things
-        const combinedGames = results.flat();
+        // const combinedGames = results.flat();
         const combinedAndSorted = results.flat().sort((a, b) => {
           return a.name.localeCompare(b.name);
         });
@@ -33,12 +38,35 @@ export default function GamesPage() {
     fetchAllGames();
   }, []);
 
-  if (loading) return <div>Scanning libraries...</div>;
+  // Use useMemo to filter games so it doesn't re-calculate unless games or filter changes
+  const filteredGames = useMemo(() => {
+    return games.filter((game) => {
+      const matchesPlatform =
+        activeFilter === "all" ||
+        game.platform.toLowerCase() === activeFilter.toLowerCase();
+
+      const matchesSearch = game.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      return matchesPlatform && matchesSearch;
+    });
+  }, [games, activeFilter, searchQuery]);
+
+  // If we are loading, show the loading icon
+  if (loading) return <LoadingIcon />;
   return (
     <>
+      {/* Top Search bar with the responsbility of filters and stuff*/}
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
+      />
       <div className="columns is-multiline">
-        {games?.map((game) => (
-          <div key={game.appid} className="column is-half">
+        {filteredGames?.map((game) => (
+          <div key={game.appid} className="column">
             <Gamebox
               name={game.name}
               appid={game.appid}

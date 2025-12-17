@@ -7,6 +7,9 @@ import { launchGame } from "../../../lib/LaunchHandler";
 import { faSteam, faWindows } from "@fortawesome/free-brands-svg-icons";
 import { faGamepad, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
+// Import the specific Brand Icons from Simple Icons (si)
+import { SiEpicgames, SiUbisoft, SiEa } from "react-icons/si";
+
 type gameInfo = {
   name: string;
   path: string;
@@ -22,22 +25,58 @@ const handleOpenFileLocation = (filePath: string) => {
   }
 };
 
-const PLATFORM_ICONS: Record<string, IconDefinition> = {
-  steam: faSteam,
-  epic: faGamepad, // Epic doesn't have a FA brand icon, faGamepad is a good fallback
-  ea: faWindows,
-  ubi: faGamepad,
-};
-
 const Gamebox = (params: gameInfo) => {
-  const iconToRender =
-    params.iconClass || PLATFORM_ICONS[params.platform] || faGamepad;
+  const renderPlatformIcon = () => {
+    if (params.iconClass)
+      return <FontAwesomeIcon icon={params.iconClass} className="mr-3" />;
+    switch (params.platform) {
+      case "steam":
+        return (
+          <FontAwesomeIcon
+            icon={faSteam}
+            className="mr-3"
+            style={{ color: "#1b2838" }}
+          />
+        );
+      case "epic":
+        return <SiEpicgames className="mr-3" style={{ fontSize: "1.2rem" }} />;
+      case "ea":
+        return (
+          <SiEa
+            className="mr-3"
+            style={{ fontSize: "1.2rem", color: "#ff4747" }}
+          />
+        );
+      case "ubi":
+        return (
+          <SiUbisoft
+            className="mr-3"
+            style={{ fontSize: "1.2rem", color: "#0070ff" }}
+          />
+        );
+      default:
+        return <FontAwesomeIcon icon={faGamepad} className="mr-3" />;
+    }
+  };
+  const handleSearchOnline = () => {
+    if (!params.name) return;
+    const query = encodeURIComponent(params.name);
+    const url = `https://www.google.com/search?q=${query}`;
+    // Use the Electron API to trigger the OS browser
+    if (window.electronAPI?.openExternal) {
+      window.electronAPI.openExternal(url);
+    } else {
+      //Fallback but unlikely to hit (I think?)
+      window.open(url, "_blank");
+    }
+  };
+
   return (
     <div className="box">
-      <p className="title is-4">
-        <FontAwesomeIcon icon={iconToRender} className="mr-3" />
-        {params.name || "Unknown Name"}
-      </p>
+      <div className="is-flex is-align-items-center mb-2">
+        {renderPlatformIcon()}
+        <p className="title is-4 mb-0">{params.name || "Unknown Name"}</p>
+      </div>
       <p className="subtitle is-6 has-text-grey">
         {params.path || "Path not valid"}
       </p>
@@ -56,6 +95,9 @@ const Gamebox = (params: gameInfo) => {
             onClick={() => handleOpenFileLocation(params.path)}
           >
             Open Folder Location
+          </button>
+          <button className="button is-success" onClick={handleSearchOnline}>
+            Search Online
           </button>
         </div>
       </div>

@@ -42,11 +42,12 @@ const Navbar = () => {
           <a className="navbar-link">Options</a>
 
           <div className="navbar-dropdown">
-            <a className="navbar-item">Settings</a>
+            <a className="navbar-item" href="/settings">
+              Settings
+            </a>
             <a className="navbar-item">Other</a>
-            {/* <a className="navbar-item">Components</a> */}
             <hr className="navbar-divider" />
-            <div className="navbar-item">PLACEHOLDER VERSION HERE</div>
+            <div className="navbar-item">Prerelease</div>
           </div>
         </div>
       </nav>

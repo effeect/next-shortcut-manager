@@ -3,11 +3,12 @@ import Link from "next/link";
 declare global {
   interface Window {
     electronAPI?: {
-      getInstalledEpicGames: () => Promise<EpicGameManifest[]>;
-      getInstalledSteamGames: () => Promise<Game[]>;
+      getInstalledEpicGames: () => Promise<[]>;
+      getInstalledSteamGames: () => Promise<[]>;
       getInstalledEAGames: () => Promise<[]>;
       getInstalledUbiGames: () => Promise<[]>;
       openFileLocation: (path: string) => void;
+      openExternal: (url: string) => void;
     };
   }
 }
