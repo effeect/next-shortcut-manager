@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Gamebox from "../components/atoms/Gamebox/Gamebox";
 import { GameManifest } from "@/electron/lib/types/games";
-import { faSteam } from "@fortawesome/free-brands-svg-icons";
+
 export default function GamesPage() {
   const [games, setGames] = useState<GameManifest[]>([]);
   const [loading, setLoading] = useState(true);

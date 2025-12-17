@@ -43,7 +43,7 @@ export function getEpicInstalledGames(): GameManifest[] {
         name: parsed.DisplayName,
         appid: parsed.AppName,
         path: parsed.InstallLocation,
-        platform: "Epic", // Hardcoded since we know the source
+        platform: "epic", // Hardcoded since we know the source
       });
     } catch (err) {
       console.warn(`Failed to parse Epic manifest ${file}:`, err);

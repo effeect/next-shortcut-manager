@@ -3,12 +3,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { IconDefinition } from "@fortawesome/free-brands-svg-icons";
-
-import {
-  faSteam,
-  faWindows,
-  faItunesNote, // Example for others
-} from "@fortawesome/free-brands-svg-icons";
+import { launchGame } from "../../../lib/LaunchHandler";
+import { faSteam, faWindows } from "@fortawesome/free-brands-svg-icons";
 import { faGamepad, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
 type gameInfo = {
@@ -49,9 +45,9 @@ const Gamebox = (params: gameInfo) => {
         <div className="buttons">
           <button
             className="button is-link"
-            onClick={() =>
-              window.open(`steam://run/${params.appid || "Unknown App ID"}`)
-            }
+            onClick={() => {
+              window.open(launchGame(params));
+            }}
           >
             Launch
           </button>

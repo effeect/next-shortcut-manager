@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { GameManifest } from "../types/games";
@@ -15,6 +17,24 @@ async function runRegQuery(command: string): Promise<string> {
       return "";
     }
     throw new Error(`Registry query failed: ${error.message}`);
+  }
+}
+
+function getAppIdFromXML(installDir: string): string | null {
+  // Should be the default path for every origin/ea game.
+  const xmlPath = path.join(installDir, "__Installer", "installerdata.xml");
+  if (!fs.existsSync(xmlPath)) {
+    console.warn(`EA XML not found at: ${xmlPath}`);
+    return null;
+  }
+  try {
+    const content = fs.readFileSync(xmlPath, "utf-8");
+    // Specifically we are looking for <contentID>......</contentID>
+    const match = content.match(/<contentID>(.*?)<\/contentID>/i);
+    return match ? match[1].trim() : null;
+  } catch (err) {
+    console.error(`Failed to read EA XML for ${installDir}:`, err);
+    return null;
   }
 }
 
@@ -78,12 +98,13 @@ export async function getInstalledEAGames(): Promise<GameManifest[]> {
 
     // --- Final Validation ---
     if (name && path) {
+      const realAppId = getAppIdFromXML(path);
       eaGames.push({
-        name: name,
+        name: name || "No Name Detected",
         // Ensure path ends with a backslash
         path: path.endsWith("\\") ? path : path + "\\",
         // Use Product GUID for the most reliable App ID
-        appid: launchId || `EA_${name.replace(/[^a-zA-Z0-9]/g, "_")}`,
+        appid: realAppId || `EA_${name.replace(/[^a-zA-Z0-9]/g, "_")}`,
         platform: "ea",
       });
     }

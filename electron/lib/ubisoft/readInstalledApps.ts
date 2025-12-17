@@ -83,7 +83,7 @@ export async function getInstalledUbiGames() {
         name: extractedName,
         path: pathValue,
         appid: appid,
-        platform: "Ubisoft",
+        platform: "ubi",
       });
     }
   }
