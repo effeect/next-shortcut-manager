@@ -1,7 +1,6 @@
-import { IpcMainInvokeEvent } from "electron";
 import { exec } from "child_process";
 import { promisify } from "util";
-
+import { GameManifest } from "../types/games";
 const execPromise = promisify(exec);
 
 const EA_GAMES_REG_PATH = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\EA Games";
@@ -19,14 +18,8 @@ async function runRegQuery(command: string): Promise<string> {
   }
 }
 
-/**
- * Scans the Windows Registry for installed EA Desktop games.
- * @returns {Promise<Game[]>} An array of discovered game objects.
- */
-export async function getInstalledEAGames(
-  event: IpcMainInvokeEvent
-): Promise<GameInfo[]> {
-  const eaGames: GameInfo[] = [];
+export async function getInstalledEAGames(): Promise<GameManifest[]> {
+  const eaGames: GameManifest[] = [];
   const command = `reg query "${EA_GAMES_REG_PATH}" /s`;
 
   const output = await runRegQuery(command);
@@ -91,6 +84,7 @@ export async function getInstalledEAGames(
         path: path.endsWith("\\") ? path : path + "\\",
         // Use Product GUID for the most reliable App ID
         appid: launchId || `EA_${name.replace(/[^a-zA-Z0-9]/g, "_")}`,
+        platform: "ea",
       });
     }
   }

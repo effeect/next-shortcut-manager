@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
 import vdf from "vdf-parser";
+import { GameManifest } from "../types/games";
 
 export function getInstalledSteamGames(libraryPaths: string[]) {
-  const games = [];
+  const games: GameManifest[] = [];
 
   // For loop to handle the Steam Library path
   // Normally defaults to the default C Drive location
@@ -39,9 +40,9 @@ export function getInstalledSteamGames(libraryPaths: string[]) {
             games.push({
               appid: game.appid,
               name: game.name,
-              installdir: game.installdir,
               path: path.join(steamapps, "common", game.installdir),
-              debug_info: game,
+              platform: "steam",
+              // debug_info: game,
             });
           } catch (err) {
             console.warn(`Failed to parse ${manifestPath}:`, err);

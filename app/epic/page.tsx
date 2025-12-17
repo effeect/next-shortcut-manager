@@ -2,38 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Gamebox from "../components/atoms/Gamebox/Gamebox";
-type EpicGameManifest = {
-  DisplayName: string;
-  InstallLocation: string;
-  LaunchExecutable: string;
-  AppName: string;
-  CatalogNamespace: string;
-  CatalogItemId: string;
-};
-
-type Game = {
-  appid: string;
-  name: string;
-  installdir: string;
-  path: string;
-};
-
-// Needs to be moved to the global file I feel
-declare global {
-  interface Window {
-    electronAPI?: {
-      getInstalledEpicGames: () => Promise<EpicGameManifest[]>;
-      getInstalledSteamGames: () => Promise<Game[]>;
-      getInstalledEAGames: () => Promise<[]>;
-      getInstalledUbiGames: () => Promise<[]>;
-      openFileLocation: (path: string) => void;
-    };
-  }
-}
+import { GameManifest } from "@/electron/lib/types/games";
 
 export default function InstalledGamesPage() {
   // State for the games list
-  const [games, setGames] = useState<EpicGameManifest[]>([]);
+  const [games, setGames] = useState<GameManifest[]>([]);
 
   useEffect(() => {
     if (
@@ -51,12 +24,8 @@ export default function InstalledGamesPage() {
     <>
       <div className="columns is-multiline">
         {games?.map((game) => (
-          <div key={game.AppName} className="column is-half">
-            <Gamebox
-              name={game.DisplayName}
-              appid={game.CatalogItemId}
-              path={game.InstallLocation}
-            />
+          <div key={game.name} className="column is-half">
+            <Gamebox name={game.name} appid={game.appid} path={game.path} />
           </div>
         ))}
       </div>

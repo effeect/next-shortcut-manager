@@ -1,5 +1,17 @@
 import Link from "next/link";
 
+declare global {
+  interface Window {
+    electronAPI?: {
+      getInstalledEpicGames: () => Promise<EpicGameManifest[]>;
+      getInstalledSteamGames: () => Promise<Game[]>;
+      getInstalledEAGames: () => Promise<[]>;
+      getInstalledUbiGames: () => Promise<[]>;
+      openFileLocation: (path: string) => void;
+    };
+  }
+}
+
 export default function Home() {
   return (
     <>

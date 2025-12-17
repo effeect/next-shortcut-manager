@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "bulma";
 import Navbar from "./components/atoms/Navbar";
 
+import "./lib/fontawesome";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

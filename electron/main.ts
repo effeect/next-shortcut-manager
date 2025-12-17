@@ -24,6 +24,9 @@ function createWindow() {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
     },
+    // Below to get rid of the task bar
+    // Could tie it to the Dev Mode just keeping it always enabled for now
+    // titleBarStyle: "hidden",
   });
 
   if (isDev) {

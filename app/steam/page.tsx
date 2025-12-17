@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Gamebox from "../components/atoms/Gamebox/Gamebox";
+import { faSteam } from "@fortawesome/free-brands-svg-icons";
 // Steam Type details, will fill more in later
 type Game = {
   appid: string;
@@ -31,7 +32,12 @@ export default function InstalledGamesPage() {
       <div className="columns is-multiline">
         {games?.map((game) => (
           <div key={game.appid} className="column is-half">
-            <Gamebox name={game.name} appid={game.appid} path={game.path} />
+            <Gamebox
+              name={game.name}
+              appid={game.appid}
+              path={game.path}
+              iconClass={faSteam}
+            />
           </div>
         ))}
       </div>

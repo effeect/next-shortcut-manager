@@ -10,19 +10,20 @@
 
 import fs from "fs";
 import path from "path";
+import { GameManifest } from "../types/games";
+
+// Need just for this parsing, no need to have it as an export
 type EpicGameManifest = {
   DisplayName: string;
   InstallLocation: string;
   LaunchExecutable: string;
   AppName: string;
-  CatalogNamespace: string;
-  CatalogItemId: string;
 };
 
 const manifestDir = "C:\\ProgramData\\Epic\\EpicGamesLauncher\\Data\\Manifests";
 
-export function getEpicInstalledGames(): EpicGameManifest[] {
-  const games: EpicGameManifest[] = [];
+export function getEpicInstalledGames(): GameManifest[] {
+  const games: GameManifest[] = [];
 
   if (!fs.existsSync(manifestDir)) {
     console.warn(`Epic manifest directory not found: ${manifestDir}`);
@@ -38,7 +39,12 @@ export function getEpicInstalledGames(): EpicGameManifest[] {
       const raw = fs.readFileSync(fullPath, "utf-8");
       const parsed = JSON.parse(raw) as EpicGameManifest;
 
-      games.push(parsed);
+      games.push({
+        name: parsed.DisplayName,
+        appid: parsed.AppName,
+        path: parsed.InstallLocation,
+        platform: "Epic", // Hardcoded since we know the source
+      });
     } catch (err) {
       console.warn(`Failed to parse Epic manifest ${file}:`, err);
     }

@@ -5,13 +5,7 @@ import { IpcMainInvokeEvent } from "electron";
 import { exec } from "child_process";
 import { promisify } from "util";
 import path from "path";
-
-type Game = {
-  appid: string;
-  name: string;
-  installdir: string;
-  path: string;
-};
+import { GameManifest } from "../types/games";
 
 const execPromise = promisify(exec);
 
@@ -32,8 +26,8 @@ async function runRegQuery(command: string): Promise<string> {
   }
 }
 
-export async function getInstalledUbiGames(event: IpcMainInvokeEvent) {
-  const ubiGames: Game[] = [];
+export async function getInstalledUbiGames() {
+  const ubiGames: GameManifest[] = [];
   const command = `reg query "${UBI_GAMES_REG_PATH}" /s`;
   const output = await runRegQuery(command);
 
@@ -83,13 +77,13 @@ export async function getInstalledUbiGames(event: IpcMainInvokeEvent) {
 
     // Only push to the array if the Ubisoft stuff is present
     if (appid && pathValue) {
-      name = `Ubisoft Game ${appid}`;
+      // name = `Ubisoft Game ${appid}`;
       const extractedName = path.basename(pathValue);
       ubiGames.push({
         name: extractedName,
-        installdir: pathValue,
         path: pathValue,
         appid: appid,
+        platform: "Ubisoft",
       });
     }
   }
