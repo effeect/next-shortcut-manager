@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "bulma";
+import "bulma/css/bulma.min.css";
 import Navbar from "./components/atoms/Navbar";
 
 import "./lib/fontawesome";

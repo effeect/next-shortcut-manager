@@ -17,9 +17,13 @@ import {
   saveCustomGame,
   selectGamePath,
 } from "./handles/custom";
+import serve from "electron-serve";
 
 // Way to determine if the electron app is packaged or not
 const isDev = process.env.NODE_ENV === "development";
+const loadURL = serve({
+  directory: path.join(__dirname, "..", "..", "renderer", "out"),
+});
 
 console.log(isDev);
 console.log(process.env.NODE_ENV);
@@ -37,20 +41,13 @@ function createWindow() {
   });
 
   if (isDev) {
-    console.log("here");
-    // DEVELOPMENT: Load the Next.js development server URL
+    win.setMenuBarVisibility(true);
     win.loadURL("http://localhost:3000");
     win.webContents.openDevTools(); // Optional: open dev tools in development
   } else {
-    const indexPath = path.join(
-      __dirname,
-      "..",
-      "renderer",
-      "out",
-      "index.html"
-    );
-    console.log(`Loading production file: ${indexPath}`);
-    win.loadFile(indexPath);
+    console.log("Loading this");
+    win.setMenuBarVisibility(false);
+    loadURL(win);
   }
 }
 

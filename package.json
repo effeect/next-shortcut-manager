@@ -1,6 +1,8 @@
 {
   "name": "next-shortcut-manager",
   "version": "0.1.0",
+  "description": "A game shortcut manager",
+  "authors": "Oliver Dimes",
   "private": true,
   "main": "dist/electron/electron/main.js",
   "scripts": {
@@ -13,7 +15,8 @@
     "electron:start": "electron dist/electron/main.js",
     "electron:wait-and-start": "wait-on http://localhost:3000 && npm run electron:start",
     "electron:dev": "cross-env NODE_ENV=development concurrently -k \"npm run next-dev\" \"npm run electron:build -- --watch\" \"npm run electron:wait-and-start\"",
-    "start-electron": "npm run renderer:build && npm run electron:build && electron dist/electron/main.js"
+    "start-electron": "npm run renderer:build && npm run electron:build && electron dist/electron/main.js",
+    "make": "npm run renderer:build && npm run electron:build && electron-forge make"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
@@ -22,7 +25,7 @@
     "@fortawesome/react-fontawesome": "^3.1.1",
     "bulma": "^1.0.4",
     "cross-env": "^10.1.0",
-    "electron": "^39.2.7",
+    "electron-serve": "^3.0.0",
     "electron-store": "^11.0.2",
     "electronmon": "^2.0.4",
     "font-awesome": "^4.7.0",
@@ -35,16 +38,25 @@
     "wait-on": "^9.0.3"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-deb": "^7.10.2",
+    "@electron-forge/maker-rpm": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.27",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9.2.1",
+    "electron": "^39.2.7",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
+  },
+  "config": {
+    "forge": "./forge.config.js"
   }
 }

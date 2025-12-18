@@ -26,14 +26,18 @@ const Navbar = () => {
       >
         <div className="container">
           <div className="navbar-brand">
-            <div className="navbar-item" style={{ cursor: "default" }}>
+            <Link
+              href="/"
+              className="navbar-item"
+              style={{ cursor: "default" }}
+            >
               <span className="icon is-medium has-text-primary mr-2">
                 <FontAwesomeIcon icon={faGamepad} size="lg" />
               </span>
               <h1 className="title is-4 has-text-white mb-0">
                 Next Shortcut Manager
               </h1>
-            </div>
+            </Link>
           </div>
           <div className="navbar-menu">
             <div className="navbar-end">

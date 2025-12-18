@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist/electron", // <-- Output compiled files here
-    "rootDir": "electron",
+    "rootDir": "./",
     "forceConsistentCasingInFileNames": true,
     "types": ["node", "electron"]
   },
