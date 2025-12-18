@@ -9,16 +9,16 @@ declare global {
   interface Window {
     electronAPI?: {
       // Add game manifest below maybe?>
-      getInstalledEpicGames: () => Promise<[]>;
-      getInstalledSteamGames: () => Promise<[]>;
-      getInstalledEAGames: () => Promise<[]>;
-      getInstalledUbiGames: () => Promise<[]>;
-      getInstalledGOGGames: () => Promise<[]>;
+      getInstalledEpicGames: () => Promise<[GameManifest]>;
+      getInstalledSteamGames: () => Promise<[GameManifest]>;
+      getInstalledEAGames: () => Promise<[GameManifest]>;
+      getInstalledUbiGames: () => Promise<[GameManifest]>;
+      getInstalledGOGGames: () => Promise<[GameManifest]>;
+      getCustomSavedGames: () => Promise<[GameManifest]>;
       openFileLocation: (path: string) => void;
       openExternal: (url: string) => void;
-      getCustomSavedGames: () => Promise<[]>;
       saveCustomGame: (game: GameManifest) => void;
-      selectGamePath: () => void; // May need to add a proper return
+      selectGamePath: () => string; // May need to add a proper return
     };
   }
 }

@@ -4,16 +4,11 @@ import { useEffect, useState } from "react";
 import Gamebox from "../components/atoms/Gamebox/Gamebox";
 import { faSteam } from "@fortawesome/free-brands-svg-icons";
 // Steam Type details, will fill more in later
-type Game = {
-  appid: string;
-  name: string;
-  installdir: string;
-  path: string;
-};
+import { GameManifest } from "@/electron/lib/types/games";
 
 export default function InstalledGamesPage() {
   // State for the games list
-  const [games, setGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<GameManifest[]>([]);
 
   useEffect(() => {
     if (
@@ -37,6 +32,7 @@ export default function InstalledGamesPage() {
               appid={game.appid}
               path={game.path}
               iconClass={faSteam}
+              platform="null"
             />
           </div>
         ))}

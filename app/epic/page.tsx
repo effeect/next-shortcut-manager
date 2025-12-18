@@ -25,7 +25,12 @@ export default function InstalledGamesPage() {
       <div className="columns is-multiline">
         {games?.map((game) => (
           <div key={game.name} className="column is-half">
-            <Gamebox name={game.name} appid={game.appid} path={game.path} />
+            <Gamebox
+              name={game.name}
+              appid={game.appid}
+              path={game.path}
+              platform="null"
+            />
           </div>
         ))}
       </div>
