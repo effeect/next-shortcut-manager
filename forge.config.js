@@ -1,6 +1,8 @@
 // forge.config.js
 module.exports = {
   packagerConfig: {
+    name: "NextShortcutManager",
+    executableName: "next-shortcut-manager",
     icon: "./app/favicon.ico",
     ignore: [
       /^\/app/,
@@ -26,6 +28,7 @@ module.exports = {
         authors: "Oliver Dimes",
         version: "1.0.0",
         description: "Next Shortcut Manager Application",
+        setupExe: "NextShortcutManagerSetup.exe",
         setupIcon: "./app/favicon.ico",
       },
     },
