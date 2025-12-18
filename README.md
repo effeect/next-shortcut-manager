@@ -2,6 +2,8 @@
 
 Next shortcut manager is a Next/React based electron app designed for the use of storing shortcuts to your games and able to quickly launch them.
 
+![Early Screenshot](https://i.imgur.com/vLV2pto.png)
+
 # What is it?
 
 Effectively a glorified game launcher that I made in Electron, as a bit of background. I have way too many Steam Games and other things installed on my system and searching for them is a bit of a slog.
