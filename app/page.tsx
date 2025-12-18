@@ -7,6 +7,7 @@ declare global {
       getInstalledSteamGames: () => Promise<[]>;
       getInstalledEAGames: () => Promise<[]>;
       getInstalledUbiGames: () => Promise<[]>;
+      getInstalledGOGGames: () => Promise<[]>;
       openFileLocation: (path: string) => void;
       openExternal: (url: string) => void;
     };

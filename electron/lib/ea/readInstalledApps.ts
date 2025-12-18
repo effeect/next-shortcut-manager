@@ -1,24 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { exec } from "child_process";
-import { promisify } from "util";
+import { runRegQuery } from "../misc/regQuery";
 import { GameManifest } from "../types/games";
-const execPromise = promisify(exec);
 
 const EA_GAMES_REG_PATH = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\EA Games";
-
-// Run a regedit query to search for the EA Games
-async function runRegQuery(command: string): Promise<string> {
-  try {
-    const { stdout } = await execPromise(command, { encoding: "utf8" });
-    return stdout;
-  } catch (error: any) {
-    if (error.code === 1) {
-      return "";
-    }
-    throw new Error(`Registry query failed: ${error.message}`);
-  }
-}
 
 function getAppIdFromXML(installDir: string): string | null {
   // Should be the default path for every origin/ea game.

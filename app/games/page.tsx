@@ -21,6 +21,7 @@ export default function GamesPage() {
           window.electronAPI?.getInstalledEpicGames() || [],
           window.electronAPI?.getInstalledEAGames() || [],
           window.electronAPI?.getInstalledUbiGames() || [],
+          window.electronAPI?.getInstalledGOGGames() || [],
         ]);
 
         // Needed for future things

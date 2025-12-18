@@ -1,30 +1,12 @@
 // Reading the locally installed Ubisoft Games are a bit of pain
 // For this to work, we will simply use the regedit keys
-
-import { IpcMainInvokeEvent } from "electron";
-import { exec } from "child_process";
-import { promisify } from "util";
 import path from "path";
 import { GameManifest } from "../types/games";
-
-const execPromise = promisify(exec);
+import { runRegQuery } from "../misc/regQuery";
 
 // Ubisoft Installer game path, should be the same across systems
 const UBI_GAMES_REG_PATH =
   "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Ubisoft\\Launcher\\Installs";
-
-// Note, might be worth putting this into its own function as EA uses this
-async function runRegQuery(command: string): Promise<string> {
-  try {
-    const { stdout } = await execPromise(command, { encoding: "utf8" });
-    return stdout;
-  } catch (error) {
-    if (error.code === 1) {
-      return "";
-    }
-    throw new Error(`Registry query failed: ${error.message}`);
-  }
-}
 
 export async function getInstalledUbiGames() {
   const ubiGames: GameManifest[] = [];
@@ -57,7 +39,6 @@ export async function getInstalledUbiGames() {
     }
 
     let pathValue = "";
-    let name = "";
 
     for (let i = 1; i < blockLines.length; i++) {
       const line = blockLines[i];

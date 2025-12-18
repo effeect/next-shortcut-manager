@@ -11,6 +11,7 @@ import { openFolder } from "./handles/openFolder";
 import { getInstalledEAGames } from "./handles/ea";
 import { getInstalledUbiGames } from "./handles/ubisoft";
 import { openWebBrowser } from "./handles/openBrowser";
+import { getInstalledGOGGames } from "./handles/gog";
 
 // Way to determine if the electron app is packaged or not
 const isDev = process.env.NODE_ENV === "development";
@@ -49,10 +50,12 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Need to wrap these below in there own function I feel...
   ipcMain.handle("get-installed-steam-games", steam);
   ipcMain.handle("get-installed-epic-games", epic);
   ipcMain.handle("get-installed-ea-games", getInstalledEAGames);
   ipcMain.handle("get-installed-ubi-games", getInstalledUbiGames);
+  ipcMain.handle("get-installed-gog-games", getInstalledGOGGames);
   // Below are two methods for System related activites
   ipcMain.handle("show-item-in-folder", openFolder);
   ipcMain.handle("open-web-browser", openWebBrowser);

@@ -8,7 +8,7 @@ import { faSteam, faWindows } from "@fortawesome/free-brands-svg-icons";
 import { faGamepad, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
 // Import the specific Brand Icons from Simple Icons (si)
-import { SiEpicgames, SiUbisoft, SiEa } from "react-icons/si";
+import { SiEpicgames, SiUbisoft, SiEa, SiGogdotcom } from "react-icons/si";
 
 type gameInfo = {
   name: string;
@@ -26,6 +26,7 @@ const handleOpenFileLocation = (filePath: string) => {
 };
 
 const Gamebox = (params: gameInfo) => {
+  // This ought to be moved outside of the function
   const renderPlatformIcon = () => {
     if (params.iconClass)
       return <FontAwesomeIcon icon={params.iconClass} className="mr-3" />;
@@ -50,6 +51,13 @@ const Gamebox = (params: gameInfo) => {
       case "ubi":
         return (
           <SiUbisoft
+            className="mr-3"
+            style={{ fontSize: "1.2rem", color: "#0070ff" }}
+          />
+        );
+      case "gog":
+        return (
+          <SiGogdotcom
             className="mr-3"
             style={{ fontSize: "1.2rem", color: "#0070ff" }}
           />
