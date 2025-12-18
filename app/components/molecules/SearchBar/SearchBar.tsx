@@ -28,6 +28,7 @@ const SearchBar = ({
       </div>
 
       {/* Below Search bar, we have the tab filters */}
+      {/* Should be */}
       <div className="tabs is-toggle is-toggle-rounded is-centered">
         <ul>
           <li className={activeFilter === "all" ? "is-active" : ""}>
@@ -41,6 +42,12 @@ const SearchBar = ({
           </li>
           <li className={activeFilter === "ea" ? "is-active" : ""}>
             <a onClick={() => setActiveFilter("ea")}>EA</a>
+          </li>
+          <li className={activeFilter === "ubi" ? "is-active" : ""}>
+            <a onClick={() => setActiveFilter("ubi")}>Ubisoft</a>
+          </li>
+          <li className={activeFilter === "gog" ? "is-active" : ""}>
+            <a onClick={() => setActiveFilter("gog")}>GOG</a>
           </li>
         </ul>
       </div>

@@ -12,6 +12,11 @@ import { getInstalledEAGames } from "./handles/ea";
 import { getInstalledUbiGames } from "./handles/ubisoft";
 import { openWebBrowser } from "./handles/openBrowser";
 import { getInstalledGOGGames } from "./handles/gog";
+import {
+  getCustomSavedGames,
+  saveCustomGame,
+  selectGamePath,
+} from "./handles/custom";
 
 // Way to determine if the electron app is packaged or not
 const isDev = process.env.NODE_ENV === "development";
@@ -59,6 +64,11 @@ app.whenReady().then(() => {
   // Below are two methods for System related activites
   ipcMain.handle("show-item-in-folder", openFolder);
   ipcMain.handle("open-web-browser", openWebBrowser);
+  // Custom Game stuff below
+  ipcMain.handle("get-custom-games", getCustomSavedGames);
+  ipcMain.handle("save-custom-game", saveCustomGame);
+  ipcMain.handle("select-game-path", selectGamePath);
+
   createWindow();
 
   app.on("activate", () => {

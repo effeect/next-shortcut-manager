@@ -1,53 +1,85 @@
 // Taken from this https://bulma.io/documentation/components/navbar/
+"use client"; // Required for hover states and hooks
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import "./Navbar.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faGamepad,
+  faCog,
+  faPlus,
+  faChevronDown,
+  faBook,
+} from "@fortawesome/free-solid-svg-icons";
+
 const Navbar = () => {
+  const pathname = usePathname();
+  // Helper to highlight active links
+  const isActive = (path: string) => (pathname === path ? "is-active" : "");
   return (
     <>
       <nav
-        className="navbar"
+        className="navbar is-dark mb-5"
         role="navigation"
-        aria-label="dropdown navigation"
+        aria-label="main navigation"
       >
-        <div className="navbar-item">
-          <div className="field is-grouped">
-            <p className="control">
-              <a className="button is-primary" href="/games">
-                <span>All Games</span>
-              </a>
-            </p>
-            <p className="control">
-              <a className="button is-primary">
-                <span>Steam</span>
-              </a>
-            </p>
-            <p className="control">
-              <a className="button is-primary">
-                <span>Epic</span>
-              </a>
-            </p>
-            <p className="control">
-              <a className="button is-primary">
-                <span>EA</span>
-              </a>
-            </p>
-            <p className="control">
-              <a className="button is-primary">
-                <span>Ubisoft</span>
-              </a>
-            </p>
+        <div className="container">
+          <div className="navbar-brand">
+            <div className="navbar-item" style={{ cursor: "default" }}>
+              <span className="icon is-medium has-text-primary mr-2">
+                <FontAwesomeIcon icon={faGamepad} size="lg" />
+              </span>
+              <h1 className="title is-4 has-text-white mb-0">
+                Next Shortcut Manager
+              </h1>
+            </div>
           </div>
-        </div>
+          <div className="navbar-menu">
+            <div className="navbar-end">
+              <div className="navbar-item has-dropdown is-hoverable">
+                <a className="navbar-link is-arrowless">
+                  <span>Options</span>
+                  <span className="icon is-small ml-1">
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </span>
+                </a>
 
-        {/* Below is the settings menu and other misc stuff */}
-        <div className="navbar-item has-dropdown is-hoverable">
-          <a className="navbar-link">Options</a>
+                <div className="navbar-dropdown is-right">
+                  {/* Add Game Link */}
+                  <Link
+                    href="/add-game"
+                    className={`navbar-item ${isActive("/add-game")}`}
+                  >
+                    <span className="icon has-text-success mr-2">
+                      <FontAwesomeIcon icon={faPlus} />
+                    </span>
+                    <span>Add Custom Game</span>
+                  </Link>
 
-          <div className="navbar-dropdown">
-            <a className="navbar-item" href="/settings">
-              Settings
-            </a>
-            <a className="navbar-item">Other</a>
-            <hr className="navbar-divider" />
-            <div className="navbar-item">Prerelease</div>
+                  {/* Settings Link */}
+                  <Link
+                    href="/settings"
+                    className={`navbar-item ${isActive("/settings")}`}
+                  >
+                    <span className="icon has-text-info mr-2">
+                      <FontAwesomeIcon icon={faCog} />
+                    </span>
+                    <span>Settings</span>
+                  </Link>
+
+                  <hr className="navbar-divider" />
+
+                  {/* Library/Home Link */}
+                  <Link href="/" className={`navbar-item ${isActive("/")}`}>
+                    <span className="icon mr-2">
+                      <FontAwesomeIcon icon={faBook} />
+                    </span>
+                    <span>Library</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </nav>

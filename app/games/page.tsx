@@ -22,6 +22,7 @@ export default function GamesPage() {
           window.electronAPI?.getInstalledEAGames() || [],
           window.electronAPI?.getInstalledUbiGames() || [],
           window.electronAPI?.getInstalledGOGGames() || [],
+          window.electronAPI?.getCustomSavedGames() || [],
         ]);
 
         // Needed for future things
