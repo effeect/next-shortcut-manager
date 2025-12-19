@@ -1,0 +1,32 @@
+name: Build Electron Exe
+on: [push]
+
+jobs:
+  build:
+  # This program will only run on Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      # Install all the dependencies for the program
+      - name: Install Dependencies
+        run: npm install
+      # Run the make command which will do the following
+      # - Compile the Next app into a small html export
+      # - Compile the TS into JS for the electron app
+      # - Package it using Maker Squirrel : https://www.electronforge.io/config/makers/squirrel.windows
+      - name: Run Electron Forge Make
+        run: npm run make
+
+      - name: Upload the Electron exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: squirrel-windows-installer
+          # Squirrel outputs to out/make/squirrel/win32/x64/
+          path: out/make/squirrel/win32/x64/
