@@ -1,21 +1,41 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRotate } from "@fortawesome/free-solid-svg-icons";
+import {
+  PLATFORMS,
+  PLATFORM_LABELS,
+  Platform,
+} from "@/electron/lib/types/games";
+
+export type LibraryFilter = "all" | Platform;
+
 // Props for the Search Bar
 type SearchBarProps = {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
-  activeFilter: string;
-  setActiveFilter: (value: string) => void;
+  activeFilter: LibraryFilter;
+  setActiveFilter: (value: LibraryFilter) => void;
+  onRefresh: () => void;
+  refreshing: boolean;
 };
+
+// The tabs come from PLATFORMS, so a new launcher gets a tab automatically
+const FILTERS: { id: LibraryFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  ...PLATFORMS.map((id) => ({ id, label: PLATFORM_LABELS[id] })),
+];
 
 const SearchBar = ({
   searchQuery,
   setSearchQuery,
   activeFilter,
   setActiveFilter,
+  onRefresh,
+  refreshing,
 }: SearchBarProps) => {
   return (
     <div className="container p-5">
-      <div className="field">
-        <p className="control has-icons-center">
+      <div className="field has-addons">
+        <p className="control is-expanded">
           <input
             className="input is-rounded"
             type="text"
@@ -25,30 +45,30 @@ const SearchBar = ({
             style={{ minWidth: "300px" }}
           />
         </p>
+        <p className="control">
+          {/* Rescans every launcher, e.g. after installing a game */}
+          <button
+            className={`button is-rounded ${refreshing ? "is-loading" : ""}`}
+            onClick={onRefresh}
+            disabled={refreshing}
+            title="Rescan launchers"
+          >
+            <span className="icon">
+              <FontAwesomeIcon icon={faRotate} />
+            </span>
+            <span>Refresh</span>
+          </button>
+        </p>
       </div>
 
       {/* Below Search bar, we have the tab filters */}
-      {/* Should be */}
       <div className="tabs is-toggle is-toggle-rounded is-centered">
         <ul>
-          <li className={activeFilter === "all" ? "is-active" : ""}>
-            <a onClick={() => setActiveFilter("all")}>All</a>
-          </li>
-          <li className={activeFilter === "steam" ? "is-active" : ""}>
-            <a onClick={() => setActiveFilter("steam")}>Steam</a>
-          </li>
-          <li className={activeFilter === "epic" ? "is-active" : ""}>
-            <a onClick={() => setActiveFilter("epic")}>Epic</a>
-          </li>
-          <li className={activeFilter === "ea" ? "is-active" : ""}>
-            <a onClick={() => setActiveFilter("ea")}>EA</a>
-          </li>
-          <li className={activeFilter === "ubi" ? "is-active" : ""}>
-            <a onClick={() => setActiveFilter("ubi")}>Ubisoft</a>
-          </li>
-          <li className={activeFilter === "gog" ? "is-active" : ""}>
-            <a onClick={() => setActiveFilter("gog")}>GOG</a>
-          </li>
+          {FILTERS.map(({ id, label }) => (
+            <li key={id} className={activeFilter === id ? "is-active" : ""}>
+              <a onClick={() => setActiveFilter(id)}>{label}</a>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

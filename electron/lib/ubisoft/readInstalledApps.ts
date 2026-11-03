@@ -2,73 +2,34 @@
 // For this to work, we will simply use the regedit keys
 import path from "path";
 import { GameManifest } from "../types/games";
-import { runRegQuery } from "../misc/regQuery";
+import { childKeyName, queryRegistry, stripQuotes } from "../misc/regQuery";
 
 // Ubisoft Installer game path, should be the same across systems
 const UBI_GAMES_REG_PATH =
   "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Ubisoft\\Launcher\\Installs";
 
-export async function getInstalledUbiGames() {
+export async function getInstalledUbiGames(): Promise<GameManifest[]> {
   const ubiGames: GameManifest[] = [];
-  const command = `reg query "${UBI_GAMES_REG_PATH}" /s`;
-  const output = await runRegQuery(command);
+  const keys = await queryRegistry(UBI_GAMES_REG_PATH, { recursive: true });
 
-  // Will return an empty array if there are no Ubisoft games
-  if (!output.trim()) {
-    console.log("No Ubisoft Games registry output found.");
-    return ubiGames;
-  }
-
-  const blocks = output
-    .split(new RegExp(`\r\n\r\n`, "g"))
-    .filter((block) => block.trim().startsWith(UBI_GAMES_REG_PATH));
-
-  for (const block of blocks) {
-    const blockLines = block
-      .trim()
-      .split("\r\n")
-      .filter((line) => line.trim().length > 0);
-
-    const fullKeyPathLine = blockLines[0]?.trim() || "";
-    const pathSuffix = fullKeyPathLine.replace(UBI_GAMES_REG_PATH + "\\", "");
-    const appid = pathSuffix.split("\\")[0].trim();
-
+  for (const entry of keys) {
+    const appid = childKeyName(entry.key, UBI_GAMES_REG_PATH);
     // Double check to make sure its a valid appid
-    if (!/^\d+$/.test(appid)) {
-      continue;
-    }
+    if (!appid || !/^\d+$/.test(appid)) continue;
 
-    let pathValue = "";
+    const installDir = stripQuotes(entry.values["installdir"] ?? "");
+    if (!installDir) continue;
 
-    for (let i = 1; i < blockLines.length; i++) {
-      const line = blockLines[i];
-      const match = line.match(
-        /^\s*(\S[\s\S]*?)\s+(REG_SZ|REG_DWORD)\s+([^\s].*)/i
-      );
-
-      if (match) {
-        const valueName = match[1].trim().toLowerCase();
-        const valueData = match[3].trim().replace(/["]+/g, ""); // Remove double quotes, do not remove single quotes (eg : Assassin's Creed)
-
-        if (valueName === "installdir") {
-          pathValue = valueData;
-        }
-      }
-    }
-
-    // Only push to the array if the Ubisoft stuff is present
-    if (appid && pathValue) {
-      // name = `Ubisoft Game ${appid}`;
-      const extractedName = path.basename(pathValue);
-      ubiGames.push({
-        name: extractedName,
-        path: pathValue,
-        appid: appid,
-        platform: "ubi",
-      });
-    }
+    // Ubisoft stores forward slashes (E:/ubisoft/The Crew Motorfest/)
+    const gamePath = path.normalize(installDir);
+    ubiGames.push({
+      name: path.basename(gamePath),
+      path: gamePath,
+      appid,
+      platform: "ubi",
+      launch: { type: "url", url: `uplay://launch/${appid}/0` },
+    });
   }
 
-  //   console.log("Ubisoft Games Result ", ubiGames);
   return ubiGames;
 }

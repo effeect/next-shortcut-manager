@@ -1,100 +1,53 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
-import { runRegQuery } from "../misc/regQuery";
+import { childKeyName, queryRegistry, stripQuotes } from "../misc/regQuery";
 import { GameManifest } from "../types/games";
 
 const EA_GAMES_REG_PATH = "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\EA Games";
 
-function getAppIdFromXML(installDir: string): string | null {
+async function getAppIdFromXML(installDir: string): Promise<string | undefined> {
   // Should be the default path for every origin/ea game.
   const xmlPath = path.join(installDir, "__Installer", "installerdata.xml");
-  if (!fs.existsSync(xmlPath)) {
-    console.warn(`EA XML not found at: ${xmlPath}`);
-    return null;
-  }
   try {
-    const content = fs.readFileSync(xmlPath, "utf-8");
+    const content = await fs.readFile(xmlPath, "utf-8");
     // Specifically we are looking for <contentID>......</contentID>
     const match = content.match(/<contentID>(.*?)<\/contentID>/i);
-    return match ? match[1].trim() : null;
+    return match?.[1].trim() || undefined;
   } catch (err) {
-    console.error(`Failed to read EA XML for ${installDir}:`, err);
-    return null;
+    console.warn(`Couldn't read EA XML at ${xmlPath}:`, err);
+    return undefined;
   }
 }
 
 export async function getInstalledEAGames(): Promise<GameManifest[]> {
-  const eaGames: GameManifest[] = [];
-  const command = `reg query "${EA_GAMES_REG_PATH}" /s`;
+  const keys = await queryRegistry(EA_GAMES_REG_PATH, { recursive: true });
 
-  const output = await runRegQuery(command);
-  //   console.log(output);
-  if (!output.trim()) {
-    console.log("No EA Games registry output found.");
-    return eaGames;
-  }
+  const games = await Promise.all(
+    keys.map(async (entry): Promise<GameManifest | undefined> => {
+      // Only direct children are games, deeper keys are DLC / install options
+      const gameKeyName = childKeyName(entry.key, EA_GAMES_REG_PATH);
+      if (!gameKeyName) return undefined;
 
-  const blocks = output
-    .split(new RegExp(`\r\n\r\n`, "g")) // Split by the double newline used between keys
-    .filter((block) => block.trim().startsWith(EA_GAMES_REG_PATH));
+      const name = entry.values["displayname"] || gameKeyName;
+      const installDir = stripQuotes(entry.values["install dir"] ?? "");
+      if (!installDir) return undefined;
 
-  for (const block of blocks) {
-    const blockLines = block
-      .trim()
-      .split("\r\n")
-      .filter((line) => line.trim().length > 0);
+      const contentId = await getAppIdFromXML(installDir);
+      const appid = contentId || `EA_${name.replace(/[^a-zA-Z0-9]/g, "_")}`;
 
-    const fullKeyPathLine = blockLines[0]?.trim() || "";
-
-    const pathSuffix = fullKeyPathLine.replace(EA_GAMES_REG_PATH + "\\", "");
-
-    if (pathSuffix.includes("\\")) {
-      console.log(`Skipping sub-folder/DLC key: ${pathSuffix}`);
-      continue;
-    }
-
-    const gameKeyName = pathSuffix;
-
-    let name = gameKeyName;
-    let path = "";
-    let launchId = "";
-    for (let i = 1; i < blockLines.length; i++) {
-      const line = blockLines[i];
-
-      const match = line.match(
-        /^\s*(\S[\s\S]*?)\s+(REG_SZ|REG_DWORD)\s+([^\s].*)/i
-      );
-
-      if (match) {
-        const valueName = match[1].trim().toLowerCase();
-        const valueData = match[3].trim().replace(/['"]+/g, ""); // Remove quotes
-
-        if (valueName === "displayname") {
-          name = valueData;
-        } else if (valueName === "install dir") {
-          // CRITICAL: Must match "Install Dir" exactly from the screenshot
-          path = valueData;
-        } else if (valueName === "product guid") {
-          // Match the Product GUID for launching
-          launchId = valueData;
-        }
-      }
-    }
-
-    // --- Final Validation ---
-    if (name && path) {
-      const realAppId = getAppIdFromXML(path);
-      eaGames.push({
-        name: name || "No Name Detected",
+      return {
+        name,
         // Ensure path ends with a backslash
-        path: path.endsWith("\\") ? path : path + "\\",
-        // Use Product GUID for the most reliable App ID
-        appid: realAppId || `EA_${name.replace(/[^a-zA-Z0-9]/g, "_")}`,
+        path: installDir.endsWith("\\") ? installDir : installDir + "\\",
+        appid,
         platform: "ea",
-      });
-    }
-  }
+        launch: {
+          type: "url",
+          url: `origin://launchgame/${encodeURIComponent(appid)}`,
+        },
+      };
+    })
+  );
 
-  console.log("EA Games Result ", eaGames);
-  return eaGames;
+  return games.filter((game): game is GameManifest => game !== undefined);
 }

@@ -1,74 +1,83 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import Gamebox from "./components/atoms/Gamebox/Gamebox";
-import { GameManifest } from "@/electron/lib/types/games";
+import { GameManifest, PLATFORM_LABELS } from "@/electron/lib/types/games";
+import type { LibraryResult, ScanError } from "@/electron/types/api";
 import LoadingIcon from "./components/atoms/LoadingIcon/LoadingIcon";
-import SearchBar from "./components/molecules/SearchBar/SearchBar";
-
-declare global {
-  interface Window {
-    electronAPI?: {
-      // Add game manifest below maybe?>
-      getInstalledEpicGames: () => Promise<[GameManifest]>;
-      getInstalledSteamGames: () => Promise<[GameManifest]>;
-      getInstalledEAGames: () => Promise<[GameManifest]>;
-      getInstalledUbiGames: () => Promise<[GameManifest]>;
-      getInstalledGOGGames: () => Promise<[GameManifest]>;
-      getCustomSavedGames: () => Promise<[GameManifest]>;
-      openFileLocation: (path: string) => void;
-      openExternal: (url: string) => void;
-      saveCustomGame: (game: GameManifest) => void;
-      selectGamePath: () => string; // May need to add a proper return
-    };
-  }
-}
+import SearchBar, {
+  LibraryFilter,
+} from "./components/molecules/SearchBar/SearchBar";
 
 export default function GamesPage() {
   const [games, setGames] = useState<GameManifest[]>([]);
+  // Launchers that couldn't be read, shown as a warning
+  const [scanErrors, setScanErrors] = useState<ScanError[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  // False when the page is opened in a normal browser instead of the app
+  const [hasApi, setHasApi] = useState(true);
   // Filter States
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<LibraryFilter>("all");
   // Search Bar Query
   const [searchQuery, setSearchQuery] = useState<string>("");
-  useEffect(() => {
-    const fetchAllGames = async () => {
-      try {
-        setLoading(true);
-        const results = await Promise.all([
-          window.electronAPI?.getInstalledSteamGames() || [],
-          window.electronAPI?.getInstalledEpicGames() || [],
-          window.electronAPI?.getInstalledEAGames() || [],
-          window.electronAPI?.getInstalledUbiGames() || [],
-          window.electronAPI?.getInstalledGOGGames() || [],
-          window.electronAPI?.getCustomSavedGames() || [],
-        ]);
 
-        // Needed for future things
-        // const combinedGames = results.flat();
-        const combinedAndSorted = results.flat().sort((a, b) => {
-          return a.name.localeCompare(b.name);
-        });
-        setGames(combinedAndSorted);
+  const applyLibrary = (library: LibraryResult) => {
+    setGames(library.games);
+    setScanErrors(library.errors);
+  };
+
+  useEffect(() => {
+    // Ignore the result if the page was left before it arrived
+    let cancelled = false;
+    const fetchLibrary = async () => {
+      try {
+        const api = window.electronAPI;
+        if (!api) {
+          setHasApi(false);
+          return;
+        }
+        // Cached in the main process, so coming back to this page is instant
+        const library = await api.getLibrary();
+        if (!cancelled) applyLibrary(library);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
-    fetchAllGames();
+    fetchLibrary();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const handleRefresh = async () => {
+    const api = window.electronAPI;
+    if (!api) return;
+    setRefreshing(true);
+    try {
+      applyLibrary(await api.getLibrary({ refresh: true }));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const handleRemoved = (removed: GameManifest) =>
+    setGames((current) =>
+      current.filter(
+        (g) => !(g.platform === removed.platform && g.appid === removed.appid)
+      )
+    );
 
   // Use useMemo to filter games so it doesn't re-calculate unless games or filter changes
   const filteredGames = useMemo(() => {
+    const query = searchQuery.toLowerCase();
     return games.filter((game) => {
       const matchesPlatform =
-        activeFilter === "all" ||
-        game.platform.toLowerCase() === activeFilter.toLowerCase();
-
-      const matchesSearch = game.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
+        activeFilter === "all" || game.platform === activeFilter;
+      const matchesSearch = game.name.toLowerCase().includes(query);
       return matchesPlatform && matchesSearch;
     });
   }, [games, activeFilter, searchQuery]);
@@ -83,18 +92,39 @@ export default function GamesPage() {
         setSearchQuery={setSearchQuery}
         activeFilter={activeFilter}
         setActiveFilter={setActiveFilter}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
       />
+
+      <div className="container px-5">
+        {!hasApi && (
+          <div className="notification is-info is-light">
+            The library only loads inside the app. Run{" "}
+            <code>npm run electron:dev</code> instead of opening this page in a
+            browser.
+          </div>
+        )}
+        {scanErrors.length > 0 && (
+          <div className="notification is-warning is-light">
+            <button className="delete" onClick={() => setScanErrors([])} />
+            {scanErrors.map((error) => (
+              <p key={error.launcher}>
+                Couldn&apos;t read your {PLATFORM_LABELS[error.launcher]} games:{" "}
+                {error.message}
+              </p>
+            ))}
+          </div>
+        )}
+        {hasApi && filteredGames.length === 0 && (
+          <p className="has-text-centered has-text-grey">No games found.</p>
+        )}
+      </div>
+
       <div className="columns is-multiline">
-        {filteredGames?.map((game) => (
-          <div key={game.appid} className="column">
-            <Gamebox
-              name={game.name}
-              appid={game.appid}
-              path={game.path}
-              platform={game.platform}
-              // Can override the icon if needed
-              // iconClass={}
-            />
+        {filteredGames.map((game) => (
+          // Steam, Ubisoft and GOG ids are all plain numbers, so ids alone can clash
+          <div key={`${game.platform}-${game.appid}`} className="column">
+            <Gamebox game={game} onRemoved={handleRemoved} />
           </div>
         ))}
       </div>

@@ -26,7 +26,7 @@ module.exports = {
       config: {
         name: "NextShortcutManager",
         authors: "Oliver Dimes",
-        version: "1.0.0",
+        // No version here: the installer uses the one from package.json
         description: "Next Shortcut Manager Application",
         setupExe: "NextShortcutManagerSetup.exe",
         setupIcon: "./app/favicon.ico",

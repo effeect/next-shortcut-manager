@@ -1,23 +1,24 @@
-import { app, BrowserWindow } from "electron";
-// import isDev from "electron-is-dev";
-import { ipcMain } from "electron";
-// Imports for handles for game launchers
-import { steam } from "./handles/steam";
-//IPC Handles
-// Steam
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 import path from "node:path";
-import { epic } from "./handles/epic";
-import { openFolder } from "./handles/openFolder";
-import { getInstalledEAGames } from "./handles/ea";
-import { getInstalledUbiGames } from "./handles/ubisoft";
-import { openWebBrowser } from "./handles/openBrowser";
-import { getInstalledGOGGames } from "./handles/gog";
-import {
-  getCustomSavedGames,
-  saveCustomGame,
-  selectGamePath,
-} from "./handles/custom";
 import serve from "electron-serve";
+// True when the Squirrel installer runs the app with --squirrel-install/updated/uninstall etc.
+// It creates/removes the Start menu + desktop shortcuts for us, then we just need to quit.
+import squirrelStartup from "electron-squirrel-startup";
+//IPC Handles
+import { handleGetLibrary, handleLaunchGame, warmLibraryCache } from "./handles/library";
+import { openFolder } from "./handles/openFolder";
+import { openWebBrowser } from "./handles/openBrowser";
+import {
+  handleRemoveCustomGame,
+  handleSaveCustomGame,
+  handleSelectGamePath,
+  handleUpdateCustomGame,
+} from "./handles/custom";
+import { isWebUrl } from "./lib/os/openBrowser";
+
+if (squirrelStartup) {
+  app.quit();
+}
 
 // Way to determine if the electron app is packaged or not
 const isDev = process.env.NODE_ENV === "development";
@@ -27,6 +28,18 @@ const loadURL = serve({
 
 console.log(isDev);
 console.log(process.env.NODE_ENV);
+
+// Compares protocol + host rather than origin, because app:// (electron-serve) has a "null" origin
+function isSameApp(url: string, currentUrl: string) {
+  try {
+    const target = new URL(url);
+    const current = new URL(currentUrl);
+    return target.protocol === current.protocol && target.host === current.host;
+  } catch {
+    return false;
+  }
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
@@ -38,6 +51,20 @@ function createWindow() {
     // Below to get rid of the task bar
     // Could tie it to the Dev Mode just keeping it always enabled for now
     // titleBarStyle: "hidden",
+  });
+
+  // Never open extra Electron windows (they'd get the preload API too).
+  // Web links go to the user's browser instead.
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (isWebUrl(url)) void shell.openExternal(url);
+    return { action: "deny" };
+  });
+
+  // Same idea for the main window: it should only ever show the app itself
+  win.webContents.on("will-navigate", (event, url) => {
+    if (isSameApp(url, win.webContents.getURL())) return;
+    event.preventDefault();
+    if (isWebUrl(url)) void shell.openExternal(url);
   });
 
   if (isDev) {
@@ -52,20 +79,22 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Need to wrap these below in there own function I feel...
-  ipcMain.handle("get-installed-steam-games", steam);
-  ipcMain.handle("get-installed-epic-games", epic);
-  ipcMain.handle("get-installed-ea-games", getInstalledEAGames);
-  ipcMain.handle("get-installed-ubi-games", getInstalledUbiGames);
-  ipcMain.handle("get-installed-gog-games", getInstalledGOGGames);
+  if (squirrelStartup) return;
+
+  // Library
+  ipcMain.handle("get-library", handleGetLibrary);
+  ipcMain.handle("launch-game", handleLaunchGame);
   // Below are two methods for System related activites
   ipcMain.handle("show-item-in-folder", openFolder);
   ipcMain.handle("open-web-browser", openWebBrowser);
   // Custom Game stuff below
-  ipcMain.handle("get-custom-games", getCustomSavedGames);
-  ipcMain.handle("save-custom-game", saveCustomGame);
-  ipcMain.handle("select-game-path", selectGamePath);
+  ipcMain.handle("save-custom-game", handleSaveCustomGame);
+  ipcMain.handle("update-custom-game", handleUpdateCustomGame);
+  ipcMain.handle("remove-custom-game", handleRemoveCustomGame);
+  ipcMain.handle("select-game-path", handleSelectGamePath);
 
+  // Start scanning launchers while the window loads
+  warmLibraryCache();
   createWindow();
 
   app.on("activate", () => {
@@ -81,7 +110,7 @@ app.on("window-all-closed", () => {
   }
 });
 
-/* 
+/*
 
 Use an environment switch:
 

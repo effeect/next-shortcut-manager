@@ -1,23 +1,23 @@
-import { getCustomSavedGames } from "./handles/custom";
-import { GameManifest } from "./lib/types/games";
+import { contextBridge, ipcRenderer } from "electron";
+// Type-only import: the preload runs sandboxed and can't require our other files
+import type { ElectronAPI } from "./types/api";
 
-const { contextBridge, ipcRenderer } = require("electron");
-// Exposes the API route for the electron app
-// Need to do some more testing and clamp it down maybe
-contextBridge.exposeInMainWorld("electronAPI", {
-  getInstalledSteamGames: () => ipcRenderer.invoke("get-installed-steam-games"),
-  getInstalledEpicGames: () => ipcRenderer.invoke("get-installed-epic-games"),
-  getInstalledEAGames: () => ipcRenderer.invoke("get-installed-ea-games"),
-  getInstalledUbiGames: () => ipcRenderer.invoke("get-installed-ubi-games"),
-  getInstalledGOGGames: () => ipcRenderer.invoke("get-installed-gog-games"),
-  openFileLocation: (filePath: string) => {
-    ipcRenderer.invoke("show-item-in-folder", filePath);
-  },
-  openExternal: (url: string) => ipcRenderer.invoke("open-web-browser", url),
-  saveCustomGame: (game: GameManifest) =>
-    ipcRenderer.invoke("save-custom-game", game),
+// Exposes the API route for the electron app.
+// Typed as ElectronAPI so it always matches what the UI expects.
+const electronAPI: ElectronAPI = {
+  getLibrary: (options) => ipcRenderer.invoke("get-library", options),
+  launchGame: (platform, appid) =>
+    ipcRenderer.invoke("launch-game", platform, appid),
+  openFileLocation: (filePath) =>
+    ipcRenderer.invoke("show-item-in-folder", filePath),
+  openExternal: (url) => ipcRenderer.invoke("open-web-browser", url),
   selectGamePath: () => ipcRenderer.invoke("select-game-path"),
-  getCustomSavedGames: () => ipcRenderer.invoke("get-custom-games"),
-});
+  saveCustomGame: (game) => ipcRenderer.invoke("save-custom-game", game),
+  updateCustomGame: (appid, game) =>
+    ipcRenderer.invoke("update-custom-game", appid, game),
+  removeCustomGame: (appid) => ipcRenderer.invoke("remove-custom-game", appid),
+};
+
+contextBridge.exposeInMainWorld("electronAPI", electronAPI);
 
 console.log("Preload Script loaded");
