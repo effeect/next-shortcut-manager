@@ -1,0 +1,16 @@
+/* Shared page container used by every route */
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 32px 48px;
+}
+
+.narrow {
+  max-width: 720px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 20px 16px 40px;
+  }
+}

@@ -1,75 +1,90 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotate } from "@fortawesome/free-solid-svg-icons";
-import {
-  PLATFORMS,
-  PLATFORM_LABELS,
-  Platform,
-} from "@/electron/lib/types/games";
+import { LuRefreshCw, LuSearch } from "react-icons/lu";
+import { PLATFORMS, PLATFORM_LABELS, type Platform } from "@/electron/lib/types/games";
+import PlatformIcon from "../../atoms/PlatformIcon/PlatformIcon";
+import styles from "./SearchBar.module.css";
 
 export type LibraryFilter = "all" | Platform;
 
-// Props for the Search Bar
 type SearchBarProps = {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
   activeFilter: LibraryFilter;
   setActiveFilter: (value: LibraryFilter) => void;
+  // Games per launcher, so chips can show counts and empty launchers can be hidden
+  counts: Partial<Record<Platform, number>>;
+  total: number;
   onRefresh: () => void;
   refreshing: boolean;
+  disabled?: boolean;
 };
-
-// The tabs come from PLATFORMS, so a new launcher gets a tab automatically
-const FILTERS: { id: LibraryFilter; label: string }[] = [
-  { id: "all", label: "All" },
-  ...PLATFORMS.map((id) => ({ id, label: PLATFORM_LABELS[id] })),
-];
 
 const SearchBar = ({
   searchQuery,
   setSearchQuery,
   activeFilter,
   setActiveFilter,
+  counts,
+  total,
   onRefresh,
   refreshing,
+  disabled,
 }: SearchBarProps) => {
+  // Only show launchers that have games (plus whichever is selected, so it can be cleared)
+  const visiblePlatforms = PLATFORMS.filter(
+    (id) => (counts[id] ?? 0) > 0 || id === activeFilter
+  );
+
   return (
-    <div className="container p-5">
-      <div className="field has-addons">
-        <p className="control is-expanded">
+    <div className={styles.toolbar}>
+      <div className={styles.row}>
+        <label className={styles.search}>
+          <span className="visually-hidden">Search your library</span>
+          <LuSearch className={styles.searchIcon} aria-hidden />
           <input
-            className="input is-rounded"
-            type="text"
-            placeholder="Search your library..."
+            className={`input ${styles.searchInput}`}
+            type="search"
+            placeholder="Search your library…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ minWidth: "300px" }}
+            disabled={disabled}
           />
-        </p>
-        <p className="control">
-          {/* Rescans every launcher, e.g. after installing a game */}
-          <button
-            className={`button is-rounded ${refreshing ? "is-loading" : ""}`}
-            onClick={onRefresh}
-            disabled={refreshing}
-            title="Rescan launchers"
-          >
-            <span className="icon">
-              <FontAwesomeIcon icon={faRotate} />
-            </span>
-            <span>Refresh</span>
-          </button>
-        </p>
+        </label>
+        {/* Rescans every launcher, e.g. after installing a game */}
+        <button
+          type="button"
+          className="btn"
+          onClick={onRefresh}
+          disabled={disabled || refreshing}
+          title="Rescan launchers"
+        >
+          <LuRefreshCw className={refreshing ? "spin" : undefined} />
+          <span>{refreshing ? "Scanning…" : "Rescan"}</span>
+        </button>
       </div>
 
-      {/* Below Search bar, we have the tab filters */}
-      <div className="tabs is-toggle is-toggle-rounded is-centered">
-        <ul>
-          {FILTERS.map(({ id, label }) => (
-            <li key={id} className={activeFilter === id ? "is-active" : ""}>
-              <a onClick={() => setActiveFilter(id)}>{label}</a>
-            </li>
-          ))}
-        </ul>
+      <div className={styles.chips} role="group" aria-label="Filter by launcher">
+        <button
+          type="button"
+          className={styles.chip}
+          aria-pressed={activeFilter === "all"}
+          onClick={() => setActiveFilter("all")}
+          disabled={disabled}
+        >
+          All <span className={styles.count}>{total}</span>
+        </button>
+        {visiblePlatforms.map((id) => (
+          <button
+            key={id}
+            type="button"
+            className={styles.chip}
+            aria-pressed={activeFilter === id}
+            onClick={() => setActiveFilter(id)}
+          >
+            <PlatformIcon platform={id} colored />
+            {PLATFORM_LABELS[id]}
+            <span className={styles.count}>{counts[id] ?? 0}</span>
+          </button>
+        ))}
       </div>
     </div>
   );

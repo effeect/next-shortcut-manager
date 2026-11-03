@@ -1,39 +1,39 @@
-import type { ReactNode } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { faSteam } from "@fortawesome/free-brands-svg-icons";
-import { faGamepad } from "@fortawesome/free-solid-svg-icons";
-import { SiEpicgames, SiUbisoft, SiEa, SiGogdotcom } from "react-icons/si";
+import type { IconType } from "react-icons";
+import { SiEa, SiEpicgames, SiGogdotcom, SiSteam, SiUbisoft } from "react-icons/si";
+import { LuGamepad2 } from "react-icons/lu";
 import type { Platform } from "@/electron/lib/types/games";
 
 // Record<Platform, ...> means TypeScript flags a missing icon when a platform is added
-const ICONS: Record<Platform, ReactNode> = {
-  steam: (
-    <FontAwesomeIcon
-      icon={faSteam}
-      className="mr-3"
-      style={{ color: "#1b2838" }}
-    />
-  ),
-  epic: <SiEpicgames className="mr-3" style={{ fontSize: "1.2rem" }} />,
-  ea: <SiEa className="mr-3" style={{ fontSize: "1.2rem", color: "#ff4747" }} />,
-  ubi: (
-    <SiUbisoft
-      className="mr-3"
-      style={{ fontSize: "1.2rem", color: "#0070ff" }}
-    />
-  ),
-  gog: (
-    <SiGogdotcom
-      className="mr-3"
-      style={{ fontSize: "1.2rem", color: "#0070ff" }}
-    />
-  ),
-  custom: <FontAwesomeIcon icon={faGamepad} className="mr-3" />,
+const ICONS: Record<Platform, IconType> = {
+  steam: SiSteam,
+  epic: SiEpicgames,
+  ea: SiEa,
+  ubi: SiUbisoft,
+  gog: SiGogdotcom,
+  custom: LuGamepad2,
 };
 
-const PlatformIcon = ({ platform }: { platform: Platform }) => (
-  <>{ICONS[platform]}</>
-);
+// The matching colour token in globals.css (--platform-steam etc.)
+export const platformColor = (platform: Platform) => `var(--platform-${platform})`;
+
+type PlatformIconProps = {
+  platform: Platform;
+  className?: string;
+  // Tint the icon with the launcher's colour
+  colored?: boolean;
+};
+
+// No hooks, so it renders on the server and inside client components alike
+const PlatformIcon = ({ platform, className, colored }: PlatformIconProps) => {
+  const Icon = ICONS[platform];
+  return (
+    <Icon
+      className={className}
+      style={colored ? { color: platformColor(platform) } : undefined}
+      // Always shown next to the launcher's name, so hide it from screen readers
+      aria-hidden
+    />
+  );
+};
 
 export default PlatformIcon;

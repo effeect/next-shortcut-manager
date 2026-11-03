@@ -1,0 +1,46 @@
+.back {
+  margin: -6px 0 12px -10px;
+  padding: 0 10px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.hint {
+  color: var(--text-faint);
+  font-size: 12.5px;
+}
+
+.pathRow {
+  display: flex;
+  gap: 8px;
+}
+
+.pathRow input {
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}

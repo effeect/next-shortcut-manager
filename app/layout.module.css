@@ -1,0 +1,17 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  height: 100vh;
+}
+
+.main {
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* The default window is 800px wide, so the sidebar shrinks to an icon rail */
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+}

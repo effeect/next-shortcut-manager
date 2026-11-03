@@ -1,0 +1,41 @@
+.section {
+  padding: 20px 24px 24px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.heading {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.text {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.launchers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.launcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev-2);
+  font-weight: 500;
+}
+
+.launcherIcon {
+  font-size: 18px;
+}

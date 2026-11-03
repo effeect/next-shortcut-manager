@@ -1,0 +1,257 @@
+/* Design tokens + a few shared primitives. Component styles live in *.module.css next to each component. */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #0d0f14;
+  --bg-elev: #151820;
+  --bg-elev-2: #1c2029;
+  --bg-hover: #232835;
+  --border: #262b37;
+  --border-strong: #343a49;
+
+  --text: #e8eaf0;
+  --text-muted: #8c94a5;
+  --text-faint: #5e6677;
+
+  --accent: #7c5cff;
+  --accent-hover: #9076ff;
+  --accent-soft: rgba(124, 92, 255, 0.16);
+  --accent-contrast: #ffffff;
+
+  --danger: #f2555a;
+  --danger-soft: rgba(242, 85, 90, 0.14);
+  --success: #33c48d;
+  --success-soft: rgba(51, 196, 141, 0.14);
+  --warning: #f3b544;
+  --warning-soft: rgba(243, 181, 68, 0.14);
+  --info: #4ea8ff;
+  --info-soft: rgba(78, 168, 255, 0.14);
+
+  /* Launcher brand tints, used for card covers and filter chips */
+  --platform-steam: #66c0f4;
+  --platform-epic: #c8ccd4;
+  --platform-ea: #ff4c4c;
+  --platform-ubi: #2b8cff;
+  --platform-gog: #b06ce0;
+  --platform-custom: #33c48d;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+
+  --sidebar-width: 220px;
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --bg: #f5f6f9;
+    --bg-elev: #ffffff;
+    --bg-elev-2: #f0f2f6;
+    --bg-hover: #e8ebf1;
+    --border: #e1e4eb;
+    --border-strong: #cdd2dc;
+
+    --text: #161922;
+    --text-muted: #5d6576;
+    --text-faint: #8d94a3;
+
+    --accent: #6a46ff;
+    --accent-hover: #5a35f0;
+    --accent-soft: rgba(106, 70, 255, 0.1);
+
+    --platform-steam: #1a6ea8;
+    --platform-epic: #3a3f4a;
+    --platform-gog: #8b3fc4;
+
+    --shadow: 0 1px 2px rgba(20, 24, 33, 0.06), 0 8px 24px rgba(20, 24, 33, 0.06);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Scrollbars that match the dark UI (Chromium/Electron) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev-2);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn svg {
+  flex-shrink: 0;
+  font-size: 1.1em;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.btn-danger:hover:not(:disabled) {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: transparent;
+}
+
+.btn-icon {
+  width: 36px;
+  padding: 0;
+}
+
+.btn-lg {
+  height: 42px;
+  padding: 0 18px;
+}
+
+/* ---------- Inputs ---------- */
+
+.input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  color: var(--text);
+  font: inherit;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+.input::placeholder {
+  color: var(--text-faint);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.input[readonly] {
+  color: var(--text-muted);
+}
+
+/* ---------- Misc ---------- */
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

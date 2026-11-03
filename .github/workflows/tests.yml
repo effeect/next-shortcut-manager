@@ -1,0 +1,72 @@
+name: Tests
+on:
+  push:
+  pull_request:
+
+# A newer push to the same branch cancels the older run
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The UI against the static export in Chromium, with a mocked Electron API.
+  # Doesn't need Windows or any launchers, so it runs on the cheaper Linux runner.
+  ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      # Also typechecks the app and the tests
+      - name: Build the static export
+        run: npm run renderer:build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run UI tests
+        run: npx playwright test --project=ui
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-ui
+          path: playwright-report/
+          retention-days: 14
+
+  # Smoke test of the real Electron app (main process, preload, electron-serve, launcher scan).
+  # Runs on Windows because that's what the app ships for.
+  electron:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build the static export
+        run: npm run renderer:build
+      - name: Build the Electron main process
+        run: npm run electron:build
+      # Uses Electron's own Chromium, so no Playwright browser download is needed
+      - name: Run Electron tests
+        run: npx playwright test --project=electron
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-electron
+          path: playwright-report/
+          retention-days: 14
